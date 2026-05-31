@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عربي حي · Arabic Vivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,400&family=DM+Mono:wght@400;500&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1410;--cream:#f5f0e8;--terra:#c4602a;--gold:#d4a843;
+  --sage:#5a7a5e;--dusty:#8b7355;--light:#ece7dc;--white:#faf8f3;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Mono',monospace;background:var(--cream);color:var(--ink);}
+
+/* HEADER */
+.hdr{background:var(--ink);padding:12px 18px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:3px solid var(--terra);
+  position:sticky;top:0;z-index:99;}
+.logo{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;
+  display:flex;align-items:baseline;gap:7px;}
+.logo-ar{font-family:'Amiri',serif;color:var(--gold);font-size:1.45rem;}
+.logo-en{color:var(--cream);font-style:italic;}
+.streak{background:var(--terra);color:#fff;padding:4px 12px;
+  border-radius:20px;font-size:0.7rem;}
+
+/* TAB BAR */
+.tabs{display:flex;background:var(--ink);border-bottom:1px solid #2d1f12;
+  overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex-shrink:0;padding:10px 16px;font-family:'DM Mono',monospace;
+  font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(245,240,232,0.4);cursor:pointer;border:none;background:none;
+  border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* PANELS */
+.panel{display:none;padding:18px 16px 40px;max-width:680px;margin:0 auto;}
+.panel.active{display:block;}
+.ptitle{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;margin-bottom:3px;}
+.psub{font-size:0.67rem;color:var(--dusty);margin-bottom:18px;}
+
+/* STATS */
+.srow{display:flex;gap:9px;margin-bottom:16px;}
+.stat{flex:1;background:var(--white);border:1.5px solid var(--light);
+  border-radius:10px;padding:11px 6px;text-align:center;}
+.sn{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:var(--terra);}
+.sl{font-size:0.57rem;color:var(--dusty);text-transform:uppercase;letter-spacing:0.8px;margin-top:1px;}
+
+/* CATEGORY CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+.chip{background:var(--white);border:1.5px solid var(--light);border-radius:7px;
+  padding:6px 11px;font-size:0.63rem;letter-spacing:0.6px;text-transform:uppercase;
+  cursor:pointer;color:var(--dusty);transition:all 0.15s;}
+.chip.active{background:var(--terra);color:#fff;border-color:var(--terra);}
+.chip:hover{border-color:var(--terra);}
+
+/* PROGRESS BAR */
+.pbar{background:var(--light);border-radius:3px;height:4px;margin-bottom:11px;overflow:hidden;}
+.pfill{background:var(--terra);height:100%;border-radius:3px;transition:width 0.4s;}
+.pctr{font-size:0.65rem;color:var(--dusty);margin-bottom:11px;}
+
+/* FLASHCARD */
+.cwrap{perspective:1000px;margin-bottom:14px;cursor:pointer;}
+.card{position:relative;width:100%;height:215px;
+  transform-style:preserve-3d;transition:transform 0.55s cubic-bezier(.4,0,.2,1);
+  border-radius:13px;}
+.card.flipped{transform:rotateY(180deg);}
+.cf,.cb{position:absolute;inset:0;backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;border-radius:13px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:22px;border:2px solid var(--light);}
+.cf{background:var(--white);}
+.cb{background:var(--ink);color:var(--cream);transform:rotateY(180deg);border-color:var(--terra);}
+.c-ar{font-family:'Amiri',serif;font-size:3.2rem;direction:rtl;
+  line-height:1.15;color:var(--ink);margin-bottom:6px;}
+.c-rom{font-size:0.85rem;color:var(--dusty);font-style:italic;}
+.c-tap{font-size:0.58rem;color:var(--dusty);letter-spacing:1px;text-transform:uppercase;margin-top:9px;}
+.c-en{font-family:'Fraunces',serif;font-size:1.75rem;font-weight:700;color:var(--cream);margin-bottom:6px;}
+.c-exar{font-family:'Amiri',serif;font-size:1.05rem;direction:rtl;
+  color:rgba(245,240,232,0.72);text-align:center;margin-top:5px;}
+.c-exen{font-size:0.65rem;color:rgba(245,240,232,0.45);font-style:italic;
+  margin-top:3px;text-align:center;}
+
+/* CARD BUTTONS */
+.spkbtn{display:block;margin:0 auto 11px;background:var(--gold);border:none;
+  border-radius:7px;padding:8px 16px;font-size:0.7rem;
+  font-family:'DM Mono',monospace;cursor:pointer;color:var(--ink);}
+.rrow{display:flex;gap:9px;margin-bottom:11px;}
+.rb{flex:1;padding:10px 6px;border-radius:9px;border:2px solid;
+  font-family:'DM Mono',monospace;font-size:0.67rem;font-weight:500;cursor:pointer;transition:all 0.15s;text-align:center;}
+.rb.hard{background:#fdf0ec;border-color:var(--terra);color:var(--terra);}
+.rb.ok{background:#faf5e8;border-color:var(--gold);color:#8a6b20;}
+.rb.easy{background:#edf4ee;border-color:var(--sage);color:var(--sage);}
+.shuf{width:100%;padding:9px;border:1.5px dashed var(--dusty);border-radius:7px;
+  background:transparent;font-family:'DM Mono',monospace;font-size:0.67rem;
+  color:var(--dusty);cursor:pointer;margin-bottom:14px;}
+.shuf:hover{border-color:var(--terra);color:var(--terra);}
+
+/* GENERATE BOX */
+.genbox{background:var(--ink);border-radius:11px;padding:16px;margin-top:2px;}
+.gentitle{font-family:'Fraunces',serif;color:var(--gold);font-size:0.95rem;margin-bottom:3px;}
+.gensub{font-size:0.62rem;color:rgba(245,240,232,0.5);margin-bottom:11px;}
+.genrow{display:flex;gap:7px;margin-bottom:8px;}
+.genin{flex:1;background:rgba(255,255,255,0.1);border:1.5px solid rgba(255,255,255,0.2);
+  border-radius:7px;padding:8px 11px;font-family:'DM Mono',monospace;
+  font-size:0.75rem;color:var(--cream);outline:none;}
+.genin::placeholder{color:rgba(245,240,232,0.3);}
+.genin:focus{border-color:var(--gold);}
+.genbtn{background:var(--gold);color:var(--ink);border:none;border-radius:7px;
+  padding:8px 14px;font-family:'DM Mono',monospace;font-size:0.7rem;
+  font-weight:500;cursor:pointer;white-space:nowrap;}
+.genbtn:disabled{opacity:0.5;cursor:not-allowed;}
+.genst{font-size:0.67rem;min-height:16px;margin-bottom:8px;color:var(--cream);}
+.ideas{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.idea{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);
+  border-radius:13px;padding:4px 10px;font-size:0.6rem;
+  color:rgba(245,240,232,0.6);cursor:pointer;transition:all 0.15s;}
+.idea:hover{background:rgba(212,168,67,0.2);border-color:var(--gold);color:var(--gold);}
+.paste-area{display:none;margin-top:10px;}
+.paste-label{font-size:0.6rem;color:rgba(245,240,232,0.5);margin-bottom:5px;}
+.paste-ta{width:100%;height:64px;background:rgba(255,255,255,0.08);
+  border:1.5px solid rgba(255,255,255,0.18);border-radius:7px;padding:8px;
+  font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--cream);
+  outline:none;resize:none;}
+.paste-btn{margin-top:6px;width:100%;padding:8px;background:var(--gold);
+  color:var(--ink);border:none;border-radius:7px;font-family:'DM Mono',monospace;
+  font-size:0.7rem;cursor:pointer;}
+
+/* SENTENCES */
+.slist{display:flex;flex-direction:column;gap:9px;}
+.sc{background:var(--white);border:1.5px solid var(--light);border-radius:10px;
+  padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color 0.15s;}
+.sc:hover{border-color:var(--gold);}
+.sc-ar{font-family:'Amiri',serif;font-size:1.35rem;direction:rtl;flex:1;text-align:right;}
+.sc-left{flex:1;}
+.sc-en{font-size:0.82rem;color:var(--ink);}
+.sc-rom{font-size:0.67rem;color:var(--dusty);font-style:italic;margin-top:2px;}
+.sc-spk{width:30px;height:30px;border-radius:50%;background:var(--gold);
+  border:none;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;}
+
+/* STORIES */
+.stlist{display:flex;flex-direction:column;gap:12px;}
+.stcard{background:var(--white);border:1.5px solid var(--light);border-radius:11px;overflow:hidden;}
+.sthead{padding:13px 15px;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.sthead:hover{background:rgba(196,96,42,0.03);}
+.st-ar{font-family:'Amiri',serif;font-size:1.2rem;direction:rtl;}
+.st-en{font-size:0.73rem;color:var(--dusty);margin-top:1px;}
+.stlvl{font-size:0.57rem;background:var(--terra);color:#fff;padding:2px 8px;
+  border-radius:9px;text-transform:uppercase;flex-shrink:0;margin-top:3px;}
+.stbody{display:none;padding:0 15px 15px;border-top:1px solid var(--light);}
+.stbody.open{display:block;}
+.st-artext{font-family:'Amiri',serif;font-size:1.08rem;direction:rtl;
+  line-height:1.9;margin:11px 0;color:var(--ink);}
+.st-entext{font-size:0.74rem;color:var(--dusty);line-height:1.65;
+  font-style:italic;margin-bottom:11px;}
+.stbtn{padding:6px 12px;border-radius:6px;border:1.5px solid var(--light);
+  background:var(--white);font-family:'DM Mono',monospace;font-size:0.62rem;
+  cursor:pointer;color:var(--dusty);}
+.stbtn:hover{border-color:var(--terra);color:var(--terra);}
+
+/* QUIZ */
+.q-ar{font-family:'Amiri',serif;font-size:3rem;text-align:center;
+  margin:14px 0 5px;direction:rtl;line-height:1.2;}
+.q-sub{font-size:0.67rem;color:var(--dusty);text-align:center;margin-bottom:4px;}
+.q-rom{font-size:0.82rem;color:var(--dusty);font-style:italic;text-align:center;margin-bottom:14px;}
+.q-hear{background:var(--gold);border:none;border-radius:15px;padding:6px 15px;
+  font-size:0.67rem;font-family:'DM Mono',monospace;cursor:pointer;color:var(--ink);
+  display:block;margin:0 auto 16px;}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px;}
+.q-opt{background:var(--white);border:1.5px solid var(--light);border-radius:9px;
+  padding:13px;font-family:'DM Mono',monospace;font-size:0.82rem;cursor:pointer;
+  transition:all 0.15s;text-align:center;}
+.q-opt:hover{border-color:var(--terra);}
+.q-opt.cor{background:#edf4ee;border-color:var(--sage);color:var(--sage);}
+.q-opt.wrg{background:#fdf0ec;border-color:var(--terra);color:var(--terra);}
+.q-opt.dis{pointer-events:none;opacity:0.5;}
+.q-fb{text-align:center;font-size:0.8rem;min-height:20px;margin-bottom:12px;}
+.q-fb.g{color:var(--sage);}
+.q-fb.b{color:var(--terra);}
+.nxtbtn{width:100%;padding:11px;background:var(--terra);color:#fff;border:none;
+  border-radius:9px;font-family:'DM Mono',monospace;font-size:0.75rem;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+
+/* TUTOR */
+.qrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.qchip{background:var(--white);border:1.5px solid var(--light);border-radius:15px;
+  padding:6px 11px;font-family:'DM Mono',monospace;font-size:0.6rem;
+  cursor:pointer;color:var(--dusty);transition:all 0.15s;}
+.qchip:hover{border-color:var(--gold);color:var(--ink);}
+.tutbox{background:var(--ink);border-radius:11px;padding:16px;}
+.tut-msg{color:rgba(245,240,232,0.82);font-size:0.78rem;line-height:1.6;margin-bottom:11px;}
+.tut-ar{font-family:'Amiri',serif;font-size:1.1rem;color:var(--gold);
+  display:block;direction:rtl;margin-top:6px;}
+.tut-note{font-size:0.62rem;color:rgba(245,240,232,0.35);line-height:1.5;
+  border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;}
+/* CHAT UI */
+.chatbox{background:var(--white);border:1.5px solid var(--light);border-radius:11px;
+  padding:14px;height:320px;overflow-y:auto;display:flex;flex-direction:column;
+  gap:10px;margin-bottom:12px;}
+.cmsg{display:flex;flex-direction:column;gap:3px;max-width:88%;}
+.cmsg.ai{align-self:flex-start;}
+.cmsg.user{align-self:flex-end;}
+.clbl{font-size:0.57rem;color:var(--dusty);letter-spacing:0.7px;text-transform:uppercase;}
+.cmsg.user .clbl{text-align:right;}
+.cbbl{padding:9px 13px;border-radius:9px;font-size:0.8rem;line-height:1.5;}
+.cmsg.ai .cbbl{background:var(--light);color:var(--ink);}
+.cmsg.user .cbbl{background:var(--terra);color:#fff;}
+.c-ar-msg{font-family:'Amiri',serif;font-size:1rem;direction:rtl;display:block;
+  margin-top:4px;color:var(--gold);}
+.typing-dot{color:var(--dusty);font-style:italic;font-size:0.78rem;}
+.cinrow{display:flex;gap:8px;}
+.cin{flex:1;background:var(--white);border:1.5px solid var(--light);border-radius:8px;
+  padding:9px 12px;font-family:'DM Mono',monospace;font-size:0.78rem;
+  color:var(--ink);outline:none;}
+.cin:focus{border-color:var(--terra);}
+.csend{background:var(--terra);color:#fff;border:none;border-radius:8px;
+  padding:9px 16px;font-family:'DM Mono',monospace;font-size:0.75rem;cursor:pointer;}
+.csend:hover{background:#a8501f;}
+
+/* PROGRESS */
+.psec{background:var(--white);border:1.5px solid var(--light);border-radius:11px;
+  padding:16px;margin-bottom:13px;}
+.psec h3{font-family:'Fraunces',serif;font-size:0.95rem;margin-bottom:12px;}
+.brow{margin-bottom:10px;}
+.blbl{display:flex;justify-content:space-between;font-size:0.63rem;
+  color:var(--dusty);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px;}
+.btrk{background:var(--light);border-radius:3px;height:6px;overflow:hidden;}
+.bfil{height:100%;border-radius:3px;transition:width 1s ease;}
+.bfil.t{background:var(--terra);}
+.bfil.g{background:var(--gold);}
+.bfil.s{background:var(--sage);}
+.hmwrap{display:flex;gap:3px;flex-wrap:wrap;margin-top:6px;}
+.hmc{width:13px;height:13px;border-radius:2px;background:var(--light);}
+.hmc.l1{background:rgba(196,96,42,0.2);}
+.hmc.l2{background:rgba(196,96,42,0.45);}
+.hmc.l3{background:rgba(196,96,42,0.7);}
+.hmc.l4{background:var(--terra);}
+.tip{background:var(--ink);color:var(--cream);border-radius:9px;
+  padding:13px 15px;font-size:0.74rem;line-height:1.55;display:flex;gap:9px;margin-bottom:10px;}
+.tip-ar{font-family:'Amiri',serif;font-size:0.98rem;color:var(--gold);}
+
+/* ALPHABET */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:7px;margin-bottom:20px;}
+.lc{background:var(--white);border:1.5px solid var(--light);border-radius:8px;
+  padding:10px 5px 8px;text-align:center;cursor:pointer;transition:all 0.18s;}
+.lc:hover{border-color:var(--terra);transform:translateY(-2px);}
+.lc.lit{border-color:var(--sage);}
+.l-ar{font-family:'Amiri',serif;font-size:1.8rem;display:block;line-height:1.1;}
+.l-nm{font-size:0.56rem;color:var(--dusty);text-transform:uppercase;margin-top:2px;display:block;}
+.l-sn{font-size:0.61rem;color:var(--terra);font-style:italic;display:block;}
+.ftbl{width:100%;border-collapse:collapse;background:var(--white);margin-bottom:18px;}
+.ftbl th{background:var(--ink);color:var(--cream);padding:7px 5px;
+  text-align:center;font-size:0.58rem;letter-spacing:0.8px;text-transform:uppercase;}
+.ftbl td{padding:8px 5px;text-align:center;border-bottom:1px solid var(--light);font-size:0.68rem;}
+.ftbl td.ar{font-family:'Amiri',serif;font-size:1.2rem;direction:rtl;}
+
+@media(max-width:420px){
+  .q-opts{grid-template-columns:1fr;}
+  .c-ar{font-size:2.6rem;}
+  .q-ar{font-size:2.4rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="logo">
+    <span class="logo-ar">عربي</span>
+    <span class="logo-en">Vivo</span>
+  </div>
+  <div class="streak">🔥 <span id="streakNum">0</span> day streak</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('alpha',this)">أ Alphabet</button>
+  <button class="tab" onclick="showTab('cards',this)">Cards</button>
+  <button class="tab" onclick="showTab('sents',this)">Phrases</button>
+  <button class="tab" onclick="showTab('stories',this)">Stories</button>
+  <button class="tab" onclick="showTab('quiz',this)">Quiz</button>
+  <button class="tab" onclick="showTab('tutor',this)">Tutor</button>
+  <button class="tab" onclick="showTab('prog',this)">Progress</button>
+</div>
+
+<!-- ALPHABET -->
+<div class="panel active" id="panel-alpha">
+  <div class="ptitle">الأبجدية · The Alphabet</div>
+  <div class="psub">Tap any letter to hear it · 28 letters · right to left</div>
+  <div class="agrid" id="agrid"></div>
+  <div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:700;margin-bottom:5px;">Letter Forms</div>
+  <div class="psub">Arabic letters change shape depending on position in a word</div>
+  <table class="ftbl">
+    <thead><tr><th>Letter</th><th>Alone</th><th>Initial</th><th>Medial</th><th>Final</th></tr></thead>
+    <tbody id="ftbody"></tbody>
+  </table>
+  <div class="tip">
+    <span>💡</span>
+    <span>Arabic reads <b>right to left</b>. Most letters connect and change form. Sun letters absorb the ال — <span class="tip-ar">الشمس</span> sounds like "ash-shams" not "al-shams".</span>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div class="panel" id="panel-cards">
+  <div class="srow">
+    <div class="stat"><div class="sn" id="fcSeen">0</div><div class="sl">Seen</div></div>
+    <div class="stat"><div class="sn" id="fcEasy">0</div><div class="sl">Easy</div></div>
+    <div class="stat"><div class="sn" id="fcLeft">0</div><div class="sl">Left</div></div>
+  </div>
+  <div class="chips" id="catChips"></div>
+  <div class="pbar"><div class="pfill" id="fcBar" style="width:0%"></div></div>
+  <div class="pctr" id="fcCtr">Card 1 of 33</div>
+  <div class="cwrap" onclick="flipCard()">
+    <div class="card" id="theCard">
+      <div class="cf">
+        <div class="c-ar" id="cAr"></div>
+        <div class="c-rom" id="cRom"></div>
+        <div class="c-tap">tap to reveal</div>
+      </div>
+      <div class="cb">
+        <div class="c-en" id="cEn"></div>
+        <div class="c-exar" id="cExAr"></div>
+        <div class="c-exen" id="cExEn"></div>
+      </div>
+    </div>
+  </div>
+  <button class="spkbtn" onclick="spkCard()">🔊 Listen</button>
+  <div class="rrow">
+    <button class="rb hard" onclick="rate('hard')">😓 Again</button>
+    <button class="rb ok" onclick="rate('ok')">🤔 Good</button>
+    <button class="rb easy" onclick="rate('easy')">😊 Easy</button>
+  </div>
+  <button class="shuf" onclick="shuffle()">↺ Shuffle new batch</button>
+
+  <div class="genbox">
+    <div class="gentitle">✨ Generate New Category</div>
+    <div class="gensub">Type any topic — Claude instantly creates 8 Arabic words and adds a new category</div>
+    <div class="genrow">
+      <input class="genin" id="genIn" placeholder="e.g. food, animals, colours…" onkeydown="if(event.key==='Enter')doGen()">
+      <button class="genbtn" id="genBtn" onclick="doGen()">Generate ↗</button>
+    </div>
+    <div class="genst" id="genSt"></div>
+    <div class="ideas">
+      <span class="idea" onclick="doGenT('food and restaurants')">🍽 Food</span>
+      <span class="idea" onclick="doGenT('family members')">👨‍👩‍👧 Family</span>
+      <span class="idea" onclick="doGenT('technology and phones')">📱 Tech</span>
+      <span class="idea" onclick="doGenT('health and hospital')">🏥 Health</span>
+      <span class="idea" onclick="doGenT('weather and seasons')">🌤 Weather</span>
+      <span class="idea" onclick="doGenT('colours and shapes')">🎨 Colours</span>
+      <span class="idea" onclick="doGenT('animals')">🦁 Animals</span>
+      <span class="idea" onclick="doGenT('sports and fitness')">⚽ Sports</span>
+    </div>
+    <div class="paste-area" id="pasteArea">
+      <div class="paste-label">Paste Claude's JSON response here then tap Load:</div>
+      <textarea class="paste-ta" id="pasteTA" placeholder='[{"ar":"...","rom":"...","en":"...","ex":"...","exEn":"..."}]'></textarea>
+      <button class="paste-btn" onclick="loadPaste()">Load words ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHRASES -->
+<div class="panel" id="panel-sents">
+  <div class="ptitle">Phrases</div>
+  <div class="psub">Tap any card to hear it · all with romanization</div>
+  <div class="chips" id="sentChips"></div>
+  <div class="slist" id="sentList"></div>
+</div>
+
+<!-- STORIES -->
+<div class="panel" id="panel-stories">
+  <div class="ptitle">Stories</div>
+  <div class="psub">Read · Listen · Understand · Beginner to Intermediate</div>
+  <div class="stlist" id="stList"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="panel" id="panel-quiz">
+  <div class="srow">
+    <div class="stat"><div class="sn" id="qSc">0</div><div class="sl">Score</div></div>
+    <div class="stat"><div class="sn" id="qTot">0</div><div class="sl">Done</div></div>
+    <div class="stat"><div class="sn" id="qStrk">0</div><div class="sl">Streak</div></div>
+  </div>
+  <div class="pbar" style="margin-bottom:6px"><div class="pfill" id="qBar" style="width:0%"></div></div>
+  <div class="pctr" id="qCtr">Question 1</div>
+  <div class="q-ar" id="qAr">—</div>
+  <div class="q-sub">What does this mean in English?</div>
+  <div class="q-rom" id="qRom"></div>
+  <button class="q-hear" onclick="spkQuiz()">🔊 Hear it</button>
+  <div class="q-opts" id="qOpts"></div>
+  <div class="q-fb" id="qFb"></div>
+  <button class="nxtbtn" onclick="nextQ()">Next →</button>
+</div>
+
+<!-- TUTOR -->
+<div class="panel" id="panel-tutor">
+  <div class="ptitle">AI Tutor</div>
+  <div class="psub">Gulf Arabic · tap a prompt or type your own question</div>
+  <div class="qrow" id="tutorChips"></div>
+  <div class="chatbox" id="chatbox">
+    <div class="cmsg ai"><div class="clbl">Tutor</div><div class="cbbl">أهلاً! I'm your Gulf Arabic tutor. Tap a prompt above or type below — I'll reply right here.<span class="c-ar-msg">هل تريد أن نبدأ؟</span></div></div>
+  </div>
+  <div class="cinrow">
+    <input class="cin" id="chatIn" placeholder="Ask anything in English or Arabic…" onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="csend" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="panel" id="panel-prog">
+  <div class="ptitle">Progress</div>
+  <div class="psub">يوم بعد يوم · consistency is everything</div>
+  <div class="psec">
+    <h3>Vocabulary Mastery</h3>
+    <div class="brow"><div class="blbl"><span>Greetings</span><span id="p0t">0%</span></div><div class="btrk"><div class="bfil t" id="p0" style="width:0%"></div></div></div>
+    <div class="brow"><div class="blbl"><span>Numbers</span><span id="p1t">0%</span></div><div class="btrk"><div class="bfil g" id="p1" style="width:0%"></div></div></div>
+    <div class="brow"><div class="blbl"><span>Daily Life</span><span id="p2t">0%</span></div><div class="btrk"><div class="bfil s" id="p2" style="width:0%"></div></div></div>
+    <div class="brow"><div class="blbl"><span>Work</span><span id="p3t">0%</span></div><div class="btrk"><div class="bfil t" id="p3" style="width:0%"></div></div></div>
+    <div class="brow"><div class="blbl"><span>Travel</span><span id="p4t">0%</span></div><div class="btrk"><div class="bfil g" id="p4" style="width:0%"></div></div></div>
+  </div>
+  <div class="psec">
+    <h3>Session Stats</h3>
+    <div class="srow" style="margin-bottom:0">
+      <div class="stat"><div class="sn" id="pgCards">0</div><div class="sl">Cards Seen</div></div>
+      <div class="stat"><div class="sn" id="pgEasy">0</div><div class="sl">Mastered</div></div>
+      <div class="stat"><div class="sn" id="pgAcc">—</div><div class="sl">Quiz Acc.</div></div>
+    </div>
+  </div>
+  <div class="psec">
+    <h3>Activity · Last 35 Days</h3>
+    <div class="hmwrap" id="hmwrap"></div>
+  </div>
+  <div class="tip">
+    <span>📖</span>
+    <div>Greet with <span class="tip-ar">السلام عليكم</span> · reply <span class="tip-ar">وعليكم السلام</span> · instant credibility everywhere in the Arab world.</div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const LETTERS=[
+  {ar:'أ',n:'Alif',s:'a/aa'},{ar:'ب',n:'Ba',s:'b'},{ar:'ت',n:'Ta',s:'t'},{ar:'ث',n:'Tha',s:'th'},
+  {ar:'ج',n:'Jeem',s:'j'},{ar:'ح',n:'Ha',s:'ḥ'},{ar:'خ',n:'Kha',s:'kh'},{ar:'د',n:'Dal',s:'d'},
+  {ar:'ذ',n:'Dhal',s:'dh'},{ar:'ر',n:'Ra',s:'r'},{ar:'ز',n:'Zain',s:'z'},{ar:'س',n:'Seen',s:'s'},
+  {ar:'ش',n:'Sheen',s:'sh'},{ar:'ص',n:'Sad',s:'ṣ'},{ar:'ض',n:'Dad',s:'ḍ'},{ar:'ط',n:'Taa',s:'ṭ'},
+  {ar:'ظ',n:'Dhaa',s:'ẓ'},{ar:'ع',n:'Ain',s:"'"},{ar:'غ',n:'Ghain',s:'gh'},{ar:'ف',n:'Fa',s:'f'},
+  {ar:'ق',n:'Qaf',s:'q'},{ar:'ك',n:'Kaf',s:'k'},{ar:'ل',n:'Lam',s:'l'},{ar:'م',n:'Meem',s:'m'},
+  {ar:'ن',n:'Nun',s:'n'},{ar:'ه',n:'Ha',s:'h'},{ar:'و',n:'Waw',s:'w/oo'},{ar:'ي',n:'Ya',s:'y/ee'},
+];
+const FORMS=[
+  ['Alif','ا','—','—','ا'],['Ba','ب','بـ','ـبـ','ـب'],
+  ['Meem','م','مـ','ـمـ','ـم'],['Ain','ع','عـ','ـعـ','ـع'],
+  ['Lam','ل','لـ','ـلـ','ـل'],['Nun','ن','نـ','ـنـ','ـن'],
+];
+const VOCAB=[
+  {ar:'مرحبا',rom:'marhaba',en:'Hello',ex:'مرحبا كيف حالك؟',exEn:'Hello how are you?',cat:'greetings'},
+  {ar:'السلام عليكم',rom:'as-salamu alaykum',en:'Peace be upon you',ex:'السلام عليكم يا صديقي',exEn:'Peace be upon you my friend',cat:'greetings'},
+  {ar:'كيف حالك؟',rom:'kayfa haluk?',en:'How are you?',ex:'كيف حالك اليوم؟',exEn:'How are you today?',cat:'greetings'},
+  {ar:'شكراً',rom:'shukran',en:'Thank you',ex:'شكراً جزيلاً',exEn:'Thank you very much',cat:'greetings'},
+  {ar:'من فضلك',rom:'min fadlak',en:'Please',ex:'من فضلك ساعدني',exEn:'Please help me',cat:'greetings'},
+  {ar:'نعم',rom:"na'am",en:'Yes',ex:'نعم هذا صحيح',exEn:'Yes that is correct',cat:'greetings'},
+  {ar:'لا',rom:'la',en:'No',ex:'لا شكراً',exEn:'No thank you',cat:'greetings'},
+  {ar:'أهلاً وسهلاً',rom:'ahlan wa sahlan',en:'Welcome',ex:'أهلاً وسهلاً في بيتنا',exEn:'Welcome to our home',cat:'greetings'},
+  {ar:'مع السلامة',rom:"ma'a s-salama",en:'Goodbye',ex:'مع السلامة إلى اللقاء',exEn:'Goodbye see you soon',cat:'greetings'},
+  {ar:'واحد',rom:'wahid',en:'One',ex:'واحد كوب قهوة',exEn:'One cup of coffee',cat:'numbers'},
+  {ar:'اثنان',rom:'ithnan',en:'Two',ex:'عندي اثنان أخوان',exEn:'I have two brothers',cat:'numbers'},
+  {ar:'ثلاثة',rom:'thalatha',en:'Three',ex:'ثلاثة أيام',exEn:'Three days',cat:'numbers'},
+  {ar:'أربعة',rom:"arba'a",en:'Four',ex:'أربعة أشخاص',exEn:'Four people',cat:'numbers'},
+  {ar:'خمسة',rom:'khamsa',en:'Five',ex:'خمسة دولارات',exEn:'Five dollars',cat:'numbers'},
+  {ar:'عشرة',rom:"'ashara",en:'Ten',ex:'عشرة دقائق',exEn:'Ten minutes',cat:'numbers'},
+  {ar:'عشرون',rom:"'ishrun",en:'Twenty',ex:'عشرون شخصاً',exEn:'Twenty people',cat:'numbers'},
+  {ar:'مئة',rom:"mi'a",en:'One hundred',ex:'مئة ريال',exEn:'One hundred riyals',cat:'numbers'},
+  {ar:'ماء',rom:"ma'",en:'Water',ex:'أريد ماء بارداً من فضلك',exEn:'I want cold water please',cat:'daily'},
+  {ar:'طعام',rom:"ta'am",en:'Food',ex:'الطعام لذيذ جداً',exEn:'The food is very delicious',cat:'daily'},
+  {ar:'بيت',rom:'bayt',en:'House',ex:'هذا بيتنا الجديد',exEn:'This is our new home',cat:'daily'},
+  {ar:'وقت',rom:'waqt',en:'Time',ex:'ما الوقت الآن؟',exEn:'What time is it now?',cat:'daily'},
+  {ar:'يوم',rom:'yawm',en:'Day',ex:'كان يوماً جميلاً',exEn:'It was a beautiful day',cat:'daily'},
+  {ar:'كتاب',rom:'kitab',en:'Book',ex:'أحب قراءة الكتب',exEn:'I love reading books',cat:'daily'},
+  {ar:'عمل',rom:"'amal",en:'Work',ex:'لدي عمل مهم اليوم',exEn:'I have important work today',cat:'work'},
+  {ar:'اجتماع',rom:"ijtima'",en:'Meeting',ex:'الاجتماع الساعة الثانية',exEn:'The meeting is at two',cat:'work'},
+  {ar:'مشروع',rom:"mashru'",en:'Project',ex:'المشروع جاهز في الموعد',exEn:'The project is ready on time',cat:'work'},
+  {ar:'تقرير',rom:'taqrir',en:'Report',ex:'أرسل لي التقرير من فضلك',exEn:'Send me the report please',cat:'work'},
+  {ar:'رئيس',rom:"ra'is",en:'Manager',ex:'رئيسي غائب اليوم',exEn:'My manager is absent today',cat:'work'},
+  {ar:'فندق',rom:'funduq',en:'Hotel',ex:'أين أقرب فندق؟',exEn:'Where is the nearest hotel?',cat:'travel'},
+  {ar:'مطار',rom:'matar',en:'Airport',ex:'متى نصل المطار؟',exEn:'When do we arrive at the airport?',cat:'travel'},
+  {ar:'سيارة أجرة',rom:'sayyara ajra',en:'Taxi',ex:'أريد سيارة أجرة من فضلك',exEn:'I want a taxi please',cat:'travel'},
+  {ar:'يمين',rom:'yamin',en:'Right',ex:'اتجه يميناً عند الإشارة',exEn:'Turn right at the traffic light',cat:'travel'},
+  {ar:'يسار',rom:'yasar',en:'Left',ex:'البنك على اليسار',exEn:'The bank is on the left',cat:'travel'},
+];
+const SENTENCES=[
+  {ar:'أنا لا أتكلم العربية جيداً',rom:'ana la atakallam al-arabiyya jayidan',en:"I don't speak Arabic well",cat:'greetings'},
+  {ar:'هل تتكلم الإنجليزية؟',rom:'hal tatakallam al-ingliziyya?',en:'Do you speak English?',cat:'greetings'},
+  {ar:'تشرفنا بالتعرف عليك',rom:"tasharrafna bit-ta'arruf alayk",en:'Pleased to meet you',cat:'greetings'},
+  {ar:'إن شاء الله',rom:'insha allah',en:'God willing',cat:'greetings'},
+  {ar:'الحمد لله',rom:'alhamdulillah',en:'Praise God / I\'m fine',cat:'greetings'},
+  {ar:'كم الثمن؟',rom:'kam al-thaman?',en:'How much does it cost?',cat:'daily'},
+  {ar:'أين الحمام من فضلك؟',rom:'ayna l-hammam min fadlak?',en:'Where is the bathroom?',cat:'daily'},
+  {ar:'أريد أن آكل شيئاً',rom:"urid an akula shay'an",en:'I want to eat something',cat:'daily'},
+  {ar:'هل يمكنك مساعدتي؟',rom:"hal yumkinuka musa'adati?",en:'Can you help me?',cat:'daily'},
+  {ar:'الاجتماع سيبدأ بعد قليل',rom:"al-ijtima' sa-yabda'u ba'da qalil",en:'The meeting will start soon',cat:'work'},
+  {ar:'المشروع في الموعد المحدد',rom:"al-mashru' fi l-maw'id",en:'The project is on schedule',cat:'work'},
+  {ar:'شكراً على تعاونكم',rom:"shukran 'ala ta'awunikum",en:'Thank you for your cooperation',cat:'work'},
+  {ar:'أين محطة القطار؟',rom:'ayna mahatthat al-qitar?',en:'Where is the train station?',cat:'travel'},
+  {ar:'أريد غرفة لليلة واحدة',rom:'urid ghurfatan li-laylatin wahidatin',en:'I want a room for one night',cat:'travel'},
+];
+const STORIES=[
+  {tAr:'في المقهى',tEn:'At the Café',lvl:'Beginner',
+   ar:'ذهب أحمد إلى المقهى في الصباح. طلب قهوة وكعكة. قال النادل أهلاً وسهلاً! جلس أحمد بجانب النافذة. كان الجو جميلاً والقهوة لذيذة جداً.',
+   en:'Ahmed went to the café in the morning. He ordered coffee and a cake. The waiter said welcome! Ahmed sat by the window. The weather was beautiful and the coffee was very delicious.'},
+  {tAr:'في العمل',tEn:'At Work',lvl:'Beginner',
+   ar:'وصلت سارة إلى المكتب مبكراً. فتحت الحاسوب وبدأت العمل. كان لديها اجتماع في الساعة العاشرة. حضّرت التقرير وانتظرت الزملاء.',
+   en:"Sarah arrived at the office early. She opened her computer and started working. She had a meeting at ten o'clock. She prepared the report and waited for her colleagues."},
+  {tAr:'في السوق',tEn:'At the Market',lvl:'Beginner',
+   ar:'ذهبت فاطمة إلى السوق لشراء الخضروات. اشترت طماطم وخيار وبصل. سألت كم الثمن؟ قال البائع عشرة دراهم. شكرته ورجعت إلى البيت.',
+   en:'Fatima went to the market to buy vegetables. She bought tomatoes, cucumbers, and onions. She asked how much? The seller said ten dirhams. She thanked him and went home.'},
+  {tAr:'رحلة إلى دبي',tEn:'Trip to Dubai',lvl:'Intermediate',
+   ar:'سافر خالد إلى دبي لأول مرة. وصل المطار وأخذ سيارة أجرة إلى الفندق. كان الفندق قريباً من البحر. في المساء زار برج خليفة وأكل في مطعم راقٍ.',
+   en:'Khalid traveled to Dubai for the first time. He arrived at the airport and took a taxi to the hotel. The hotel was close to the sea. In the evening he visited the Burj Khalifa and ate at an upscale restaurant.'},
+];
+const TUTOR_PROMPTS=[
+  {l:'Daily phrase ↗',p:'You are my Gulf Arabic tutor. Teach me one practical Khaleeji phrase. Show Arabic script, romanization, meaning, and a natural example sentence.'},
+  {l:'Fix my Arabic ↗',p:'You are my Arabic tutor. Correct this sentence and explain the mistakes: أنا ذهب إلى السوق امس'},
+  {l:'Khaleeji slang ↗',p:'You are my Gulf Arabic tutor. Give me 5 popular Khaleeji slang words used in Saudi Arabia or UAE with pronunciation and meaning.'},
+  {l:'Grammar tip ↗',p:'You are my Arabic tutor. Explain one key Arabic grammar concept with simple examples. Make it practical and easy to remember.'},
+  {l:'Practice chat ↗',p:'You are my Gulf Arabic tutor. Start a very simple conversation with me in Arabic. Use easy words, go slowly, and gently correct my mistakes.'},
+  {l:'Numbers 1–20 ↗',p:'You are my Arabic tutor. Show me Arabic numbers 1 to 20 with Arabic script, romanization, and pronunciation tips.'},
+];
+const BASE_CATS=['all','greetings','numbers','daily','work','travel'];
+const CAT_LABELS={all:'All',greetings:'Greetings',numbers:'Numbers',daily:'Daily Life',work:'Work',travel:'Travel'};
+
+// ── STATE ─────────────────────────────────────────────────────────────
+const S={
+  seen:new Set(),easy:new Set(),
+  qSc:0,qTot:0,qStrk:0,streak:0,
+  curCat:'all',batch:[],idx:0,
+  sentCat:'all',
+  aiCats:{},
+  genTopic:'',
+};
+
+function loadState(){
+  try{
+    const d=JSON.parse(localStorage.getItem('arVivo6')||'{}');
+    S.seen=new Set(d.seen||[]);S.easy=new Set(d.easy||[]);
+    S.qSc=d.qs||0;S.qTot=d.qt||0;S.streak=d.streak||0;
+    const today=new Date().toDateString();
+    if(d.ld!==today){
+      S.streak=(d.ld===new Date(Date.now()-86400000).toDateString())?S.streak+1:1;
+      saveState();
+    }
+    if(d.aiCats){
+      Object.entries(d.aiCats).forEach(([k,info])=>{
+        S.aiCats[k]=info.label;
+        CAT_LABELS[k]=info.label;
+        (info.words||[]).forEach(w=>VOCAB.push(w));
+      });
+    }
+  }catch(e){}
+  document.getElementById('streakNum').textContent=S.streak;
+}
+function saveState(){
+  const aiData={};
+  Object.entries(S.aiCats).forEach(([k,lbl])=>{
+    aiData[k]={label:lbl,words:VOCAB.filter(v=>v.cat===k)};
+  });
+  localStorage.setItem('arVivo6',JSON.stringify({
+    seen:[...S.seen],easy:[...S.easy],
+    qs:S.qSc,qt:S.qTot,streak:S.streak,
+    ld:new Date().toDateString(),aiCats:aiData
+  }));
+}
+
+// ── TTS ───────────────────────────────────────────────────────────────
+function speak(txt){
+  if(!window.speechSynthesis)return;
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang='ar-SA';u.rate=0.82;
+  const v=speechSynthesis.getVoices().find(x=>x.lang.startsWith('ar'));
+  if(v)u.voice=v;
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────
+function showTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='prog')renderProg();
+  if(id==='quiz')renderQuiz();
+  if(id==='cards')showCard();
+}
+
+// ── ALPHABET ──────────────────────────────────────────────────────────
+function buildAlpha(){
+  const g=document.getElementById('agrid');
+  LETTERS.forEach(l=>{
+    const d=document.createElement('div');d.className='lc';
+    d.innerHTML='<span class="l-ar">'+l.ar+'</span><span class="l-nm">'+l.n+'</span><span class="l-sn">'+l.s+'</span>';
+    d.onclick=()=>{speak(l.ar);d.classList.add('lit');setTimeout(()=>d.classList.remove('lit'),700);};
+    g.appendChild(d);
+  });
+  const tb=document.getElementById('ftbody');
+  FORMS.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+r[0]+'</td><td class="ar">'+r[1]+'</td><td class="ar">'+r[2]+'</td><td class="ar">'+r[3]+'</td><td class="ar">'+r[4]+'</td>';
+    tb.appendChild(tr);
+  });
+}
+
+// ── CATEGORY CHIPS ────────────────────────────────────────────────────
+function allCats(){return [...BASE_CATS,...Object.keys(S.aiCats)];}
+
+function buildChips(elId,active,onPick){
+  const g=document.getElementById(elId);g.innerHTML='';
+  allCats().forEach(c=>{
+    const lbl=CAT_LABELS[c]||(c.replace('ai_','').replace(/_/g,' '));
+    const d=document.createElement('div');
+    d.className='chip'+(c===active?' active':'');
+    d.textContent=lbl;
+    d.onclick=()=>{
+      onPick(c);
+      document.querySelectorAll('#'+elId+' .chip').forEach(x=>x.classList.remove('active'));
+      d.classList.add('active');
+    };
+    g.appendChild(d);
+  });
+}
+
+// ── FLASHCARDS ────────────────────────────────────────────────────────
+function fVocab(cat){return cat==='all'?[...VOCAB]:VOCAB.filter(v=>v.cat===cat);}
+
+function showCard(){
+  const cards=fVocab(S.curCat);
+  if(!cards.length)return;
+  if(!S.batch.length)S.batch=[...Array(cards.length).keys()].sort(()=>Math.random()-0.5);
+  S.idx=Math.min(S.idx,S.batch.length-1);
+  const c=cards[S.batch[S.idx]];
+  document.getElementById('theCard').classList.remove('flipped');
+  document.getElementById('cAr').textContent=c.ar;
+  document.getElementById('cRom').textContent=c.rom;
+  document.getElementById('cEn').textContent=c.en;
+  document.getElementById('cExAr').textContent=c.ex||'';
+  document.getElementById('cExEn').textContent=c.exEn||'';
+  document.getElementById('fcCtr').textContent='Card '+(S.idx+1)+' of '+cards.length;
+  document.getElementById('fcBar').style.width=((S.idx+1)/cards.length*100)+'%';
+  S.seen.add(c.ar);saveState();updFC();
+  setTimeout(()=>speak(c.ar),200);
+}
+function flipCard(){document.getElementById('theCard').classList.toggle('flipped');}
+function spkCard(){const c=fVocab(S.curCat);if(c.length)speak(c[S.batch[S.idx]].ar);}
+function rate(r){
+  const c=fVocab(S.curCat);
+  if(r==='easy')S.easy.add(c[S.batch[S.idx]].ar);
+  saveState();S.idx=(S.idx+1)%S.batch.length;showCard();
+}
+function shuffle(){S.batch=[];showCard();}
+function updFC(){
+  document.getElementById('fcSeen').textContent=S.seen.size;
+  document.getElementById('fcEasy').textContent=S.easy.size;
+  document.getElementById('fcLeft').textContent=Math.max(0,VOCAB.length-S.seen.size);
+}
+
+// ── GENERATE CATEGORY ─────────────────────────────────────────────────
+function doGen(){const t=document.getElementById('genIn').value.trim();if(t)doGenT(t);}
+
+function doGenT(topic){
+  if(!topic)return;
+  S.genTopic=topic;
+  document.getElementById('genIn').value=topic;
+  document.getElementById('genBtn').disabled=true;
+  const st=document.getElementById('genSt');
+  st.textContent='⏳ Sending to Claude…';st.style.color='var(--gold)';
+  document.getElementById('pasteArea').style.display='none';
+
+  callAPI(
+    [{role:'user',content:'Generate exactly 8 Arabic words/phrases for the topic "'+topic+'". Reply with ONLY a raw JSON array. Format: [{"ar":"Arabic word","rom":"romanization","en":"English meaning","ex":"Arabic example sentence","exEn":"English translation"}]. Use simple Gulf Arabic.'}],
+    'You are an Arabic vocabulary generator. Output ONLY a raw JSON array starting with [ and ending with ]. No markdown, no explanation, no preamble.',
+    1200
+  ).then(raw=>{
+    const ok=tryLoad(raw,topic);
+    if(!ok){
+      st.textContent='Could not auto-parse. Paste Claude response below:';
+      st.style.color='var(--gold)';
+      document.getElementById('pasteArea').style.display='block';
+    }
+    document.getElementById('genBtn').disabled=false;
+  }).catch(err=>{
+    st.textContent='✗ '+err.message;
+    st.style.color='var(--terra)';
+    document.getElementById('pasteArea').style.display='block';
+    document.getElementById('genBtn').disabled=false;
+  });
+}
+
+function tryLoad(raw,topic){
+  try{
+    const m=raw.match(/\[[\s\S]*\]/);
+    if(!m)return false;
+    const words=JSON.parse(m[0]);
+    if(!Array.isArray(words)||!words.length)return false;
+    const key='ai_'+topic.toLowerCase().replace(/\W+/g,'_').slice(0,28);
+    const label='✨ '+topic.charAt(0).toUpperCase()+topic.slice(1);
+    const normed=words.map(w=>({
+      ar:w.ar||w.arabic||'',rom:w.rom||w.romanization||w.transliteration||'',
+      en:w.en||w.english||w.meaning||'',ex:w.ex||w.example||'',
+      exEn:w.exEn||w.example_en||w.exampleEn||'',cat:key
+    })).filter(w=>w.ar&&w.en);
+    if(!normed.length)return false;
+    for(let i=VOCAB.length-1;i>=0;i--){if(VOCAB[i].cat===key)VOCAB.splice(i,1);}
+    normed.forEach(w=>VOCAB.push(w));
+    S.aiCats[key]=label;CAT_LABELS[key]=label;saveState();
+    buildChips('catChips',key,c=>{S.curCat=c;S.batch=[];showCard();});
+    buildChips('sentChips',S.sentCat,c=>{S.sentCat=c;buildSents(c);});
+    S.curCat=key;S.batch=[];showCard();
+    const st=document.getElementById('genSt');
+    st.textContent='✓ '+normed.length+' words for "'+topic+'" loaded!';
+    st.style.color='var(--sage)';
+    document.getElementById('pasteTA').value='';
+    document.getElementById('pasteArea').style.display='none';
+    document.getElementById('genIn').value='';
+    return true;
+  }catch(e){return false;}
+}
+
+function loadPaste(){
+  const raw=document.getElementById('pasteTA').value.trim();
+  const st=document.getElementById('genSt');
+  if(!raw){st.textContent='✗ Nothing pasted';st.style.color='var(--terra)';return;}
+  const ok=tryLoad(raw,S.genTopic||'custom');
+  if(!ok){st.textContent='✗ Could not parse — copy the full JSON array from Claude response';st.style.color='var(--terra)';}
+}
+
+// ── SENTENCES ─────────────────────────────────────────────────────────
+function buildSents(cat){
+  const el=document.getElementById('sentList');el.innerHTML='';
+  (cat==='all'?SENTENCES:SENTENCES.filter(s=>s.cat===cat)).forEach(s=>{
+    const d=document.createElement('div');d.className='sc';
+    d.innerHTML='<div class="sc-left"><div class="sc-en">'+s.en+'</div><div class="sc-rom">'+s.rom+'</div></div><div class="sc-ar">'+s.ar+'</div><button class="sc-spk">🔊</button>';
+    d.querySelector('button').onclick=e=>{e.stopPropagation();speak(s.ar);};
+    d.onclick=()=>speak(s.ar);
+    el.appendChild(d);
+  });
+}
+
+// ── STORIES ───────────────────────────────────────────────────────────
+function buildStories(){
+  const el=document.getElementById('stList');el.innerHTML='';
+  STORIES.forEach((s,i)=>{
+    const d=document.createElement('div');d.className='stcard';
+    d.innerHTML=
+      '<div class="sthead" onclick="togSt('+i+')">'+
+        '<div><div class="st-ar">'+s.tAr+'</div><div class="st-en">'+s.tEn+'</div></div>'+
+        '<span class="stlvl">'+s.lvl+'</span>'+
+      '</div>'+
+      '<div class="stbody" id="sb'+i+'">'+
+        '<div class="st-artext">'+s.ar+'</div>'+
+        '<div class="st-entext">'+s.en+'</div>'+
+        '<button class="stbtn" onclick="speak(STORIES['+i+'].ar)">🔊 Listen full story</button>'+
+      '</div>';
+    el.appendChild(d);
+  });
+}
+function togSt(i){
+  const b=document.getElementById('sb'+i);
+  b.classList.toggle('open');
+  if(b.classList.contains('open'))setTimeout(()=>speak(STORIES[i].ar.slice(0,80)),250);
+}
+
+// ── QUIZ ──────────────────────────────────────────────────────────────
+let qCard=null,qDone=false;
+function renderQuiz(){
+  qDone=false;
+  qCard=VOCAB[Math.floor(Math.random()*VOCAB.length)];
+  document.getElementById('qAr').textContent=qCard.ar;
+  document.getElementById('qRom').textContent=qCard.rom;
+  document.getElementById('qFb').textContent='';
+  document.getElementById('qFb').className='q-fb';
+  S.qTot++;
+  document.getElementById('qCtr').textContent='Question '+S.qTot;
+  document.getElementById('qBar').style.width=Math.min(S.qTot*4,100)+'%';
+  const wrongs=VOCAB.filter(v=>v.en!==qCard.en).sort(()=>Math.random()-0.5).slice(0,3);
+  const opts=[qCard,...wrongs].sort(()=>Math.random()-0.5);
+  const c=document.getElementById('qOpts');c.innerHTML='';
+  opts.forEach(o=>{
+    const d=document.createElement('div');d.className='q-opt';d.textContent=o.en;
+    d.onclick=()=>checkQ(o.en,d);c.appendChild(d);
+  });
+  updQ();setTimeout(()=>speak(qCard.ar),300);
+}
+function checkQ(ch,el){
+  if(qDone)return;qDone=true;
+  document.querySelectorAll('.q-opt').forEach(o=>{
+    o.classList.add('dis');
+    if(o.textContent===qCard.en)o.classList.add('cor');
+  });
+  if(ch===qCard.en){
+    el.classList.remove('dis');el.classList.add('cor');
+    S.qSc++;S.qStrk++;
+    document.getElementById('qFb').textContent='✓ Correct!'+(S.qStrk>1?' '+S.qStrk+' in a row!':'');
+    document.getElementById('qFb').className='q-fb g';
+  }else{
+    el.classList.remove('dis');el.classList.add('wrg');
+    S.qStrk=0;
+    document.getElementById('qFb').textContent='✗ It was: '+qCard.en;
+    document.getElementById('qFb').className='q-fb b';
+  }
+  saveState();updQ();
+}
+function nextQ(){renderQuiz();}
+function spkQuiz(){if(qCard)speak(qCard.ar);}
+function updQ(){
+  document.getElementById('qSc').textContent=S.qSc;
+  document.getElementById('qTot').textContent=S.qTot;
+  document.getElementById('qStrk').textContent=S.qStrk;
+}
+
+// ── API CALL ──────────────────────────────────────────────────────────
+async function callAPI(messages,system,maxTokens=1000){
+  const r=await fetch('/api/chat',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+    },
+    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:maxTokens,system,messages})
+  });
+  const d=await r.json();
+  if(!r.ok)throw new Error('API '+(d?.error?.message||r.status));
+  return d.content?.[0]?.text||'';
+}
+
+// ── TUTOR ─────────────────────────────────────────────────────────────
+const TUTOR_SYS='You are a warm encouraging Gulf Arabic (Khaleeji) tutor. Keep replies concise. Always show Arabic script, romanization, and English. Focus on practical Saudi/UAE/Gulf dialect. Use a little Arabic in each reply.';
+let chatHistory=[];
+
+function buildTutor(){
+  const row=document.getElementById('tutorChips');
+  TUTOR_PROMPTS.forEach(c=>{
+    const b=document.createElement('button');b.className='qchip';b.textContent=c.l;
+    b.onclick=()=>{document.getElementById('chatIn').value=c.p;sendChat();};
+    row.appendChild(b);
+  });
+}
+
+async function sendChat(){
+  const inp=document.getElementById('chatIn');
+  const txt=inp.value.trim();if(!txt)return;
+  inp.value='';
+  addMsg('user',txt);
+  chatHistory.push({role:'user',content:txt});
+  const box=document.getElementById('chatbox');
+  const ty=document.createElement('div');ty.className='cmsg ai';
+  ty.innerHTML='<div class="clbl">Tutor</div><div class="cbbl typing-dot">typing…</div>';
+  box.appendChild(ty);box.scrollTop=box.scrollHeight;
+  try{
+    const reply=await callAPI(chatHistory,TUTOR_SYS);
+    ty.remove();addMsg('ai',reply);
+    chatHistory.push({role:'assistant',content:reply});
+    if(chatHistory.length>20)chatHistory=chatHistory.slice(-16);
+  }catch(e){
+    ty.remove();addMsg('ai','⚠️ '+e.message);
+  }
+}
+
+function addMsg(role,text){
+  const box=document.getElementById('chatbox');
+  const d=document.createElement('div');d.className='cmsg '+role;
+  const lbl=role==='ai'?'Tutor':'You';
+  d.innerHTML='<div class="clbl">'+lbl+'</div><div class="cbbl">'+text.replace(/\n/g,'<br>')+'</div>';
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+
+// ── PROGRESS ─────────────────────────────────────────────────────────
+function renderProg(){
+  ['greetings','numbers','daily','work','travel'].forEach((cat,i)=>{
+    const tot=VOCAB.filter(v=>v.cat===cat).length;
+    const done=VOCAB.filter(v=>v.cat===cat&&S.seen.has(v.ar)).length;
+    const pct=tot?Math.round(done/tot*100):0;
+    document.getElementById('p'+i+'t').textContent=pct+'%';
+    document.getElementById('p'+i).style.width=pct+'%';
+  });
+  document.getElementById('pgCards').textContent=S.seen.size;
+  document.getElementById('pgEasy').textContent=S.easy.size;
+  document.getElementById('pgAcc').textContent=S.qTot?Math.round(S.qSc/S.qTot*100)+'%':'—';
+  const hm=document.getElementById('hmwrap');hm.innerHTML='';
+  for(let i=0;i<35;i++){
+    const c=document.createElement('div');
+    c.className='hmc '+(Math.random()>.55?'l'+Math.ceil(Math.random()*4):'');
+    hm.appendChild(c);
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+loadState();
+buildAlpha();
+buildChips('catChips','all',c=>{S.curCat=c;S.batch=[];showCard();});
+buildChips('sentChips','all',c=>{S.sentCat=c;buildSents(c);});
+buildStories();buildTutor();buildSents('all');showCard();renderQuiz();updFC();
+if(Object.keys(S.aiCats).length){
+  buildChips('catChips',S.curCat,c=>{S.curCat=c;S.batch=[];showCard();});
+  buildChips('sentChips',S.sentCat,c=>{S.sentCat=c;buildSents(c);});
+}
+</script>
+</body>
+</html>
